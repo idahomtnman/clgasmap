@@ -26,6 +26,14 @@ async function loadAll() {
       }
     }
 
+    // ── Date in header ──
+    const headerDateEl = document.getElementById("header-date");
+    if (headerDateEl) {
+      headerDateEl.textContent = new Date().toLocaleDateString("en-US", {
+        month: "long", day: "numeric", year: "numeric"
+      });
+    }
+
     // ── Last-updated display ──
     const updatedEl = document.getElementById("last-updated-text");
     const footerEl  = document.getElementById("footer-updated");

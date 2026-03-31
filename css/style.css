@@ -13,8 +13,8 @@
 
   /* Text */
   --text:          #e8eaf0;
-  --text-muted:    #8b8fa8;
-  --text-dim:      #555970;
+  --text-muted:    #adb2ce;
+  --text-dim:      #878ca8;
   --accent:        #4a9eff;
   --accent-hover:  #72b4ff;
 
@@ -208,26 +208,18 @@ ul { list-style: none; }
 
 #map-svg .state-label {
   font-family: var(--font);
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
-  fill: rgba(255, 255, 255, 0.9);
   pointer-events: none;
-  paint-order: stroke;
-  stroke: rgba(0, 0, 0, 0.65);
-  stroke-width: 3px;
-  stroke-linejoin: round;
+  /* fill set dynamically per state via JS based on background luminance */
 }
 
 #map-svg .state-price-label {
   font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 400;
-  fill: rgba(255, 255, 255, 0.75);
+  font-size: 11px;
+  font-weight: 500;
   pointer-events: none;
-  paint-order: stroke;
-  stroke: rgba(0, 0, 0, 0.65);
-  stroke-width: 2.5px;
-  stroke-linejoin: round;
+  /* fill set dynamically per state via JS based on background luminance */
 }
 
 /* ── Legend ── */

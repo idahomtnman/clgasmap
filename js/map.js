@@ -30,6 +30,15 @@ const STATE_NAMES = {
   WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"
 };
 
+// WCAG relative luminance → pick dark or light label color for readability
+function labelColorFor(fillHex) {
+  const c = d3.color(fillHex);
+  if (!c) return "rgba(255,255,255,0.92)";
+  const lin = x => x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+  const L = 0.2126 * lin(c.r / 255) + 0.7152 * lin(c.g / 255) + 0.0722 * lin(c.b / 255);
+  return L > 0.35 ? "rgba(0,0,0,0.82)" : "rgba(255,255,255,0.92)";
+}
+
 // Ordinal suffix helper
 function ordinal(n) {
   const s = ["th","st","nd","rd"];
@@ -146,23 +155,33 @@ function initMap(gasData, topoData) {
         const c = path.centroid(d);
         return c && isFinite(c[0]) && isFinite(c[1]) ? `translate(${c})` : null;
       })
-      .attr("visibility", d => path.area(d) > 1200 ? "visible" : "hidden")
+      .attr("visibility", d => path.area(d) > 300 ? "visible" : "hidden")
       .attr("pointer-events", "none");
 
-  // Postal code — larger, shifted up to leave room for price below
+  // Postal code — shifted up to leave room for price below
   labelGroups.append("text")
     .attr("class", "state-label")
     .attr("text-anchor", "middle")
     .attr("dominant-baseline", "middle")
-    .attr("y", -7)
+    .attr("y", -8)
+    .attr("fill", d => {
+      const code = FIPS_TO_STATE[String(d.id).padStart(2, "0")];
+      const price = states[code]?.regular;
+      return labelColorFor(price != null ? colorScale(price) : "#3a3d50");
+    })
     .text(d => FIPS_TO_STATE[String(d.id).padStart(2, "0")] || "");
 
-  // Price — smaller than postal code but larger than original label size
+  // Price — between old label size and new postal code size
   labelGroups.append("text")
     .attr("class", "state-price-label")
     .attr("text-anchor", "middle")
     .attr("dominant-baseline", "middle")
-    .attr("y", 8)
+    .attr("y", 9)
+    .attr("fill", d => {
+      const code = FIPS_TO_STATE[String(d.id).padStart(2, "0")];
+      const price = states[code]?.regular;
+      return labelColorFor(price != null ? colorScale(price) : "#3a3d50");
+    })
     .text(d => {
       const code = FIPS_TO_STATE[String(d.id).padStart(2, "0")];
       const price = states[code]?.regular;
