@@ -20,6 +20,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 import requests
+import yfinance as yf
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
@@ -50,17 +51,9 @@ log = logging.getLogger(__name__)
 # Config
 # ---------------------------------------------------------------------------
 load_dotenv(ROOT / ".env")
-API_KEY = os.getenv("EIA_API_KEY")
-if not API_KEY:
-    log.error("EIA_API_KEY not set. Add it to .env or environment.")
-    sys.exit(1)
 
-EIA_BASE = "https://api.eia.gov/v2"
-AAA_URL  = "https://gasprices.aaa.com/state-gas-price-averages/"
-TIMEOUT  = 30
-
-WTI_PRODUCT   = "EPCWTI"
-BRENT_PRODUCT = "EPCBRENT"
+AAA_URL = "https://gasprices.aaa.com/state-gas-price-averages/"
+TIMEOUT = 30
 
 HEADERS = {
     "User-Agent": (
@@ -214,48 +207,49 @@ def fetch_gas_prices() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# EIA crude oil prices — WTI + Brent, 90 days
+# Crude oil prices — WTI + Brent, 90 days via Yahoo Finance futures
 # ---------------------------------------------------------------------------
 
-def eia_get(path: str, params: dict) -> dict:
-    params["api_key"] = API_KEY
-    url = f"{EIA_BASE}/{path}"
-    resp = requests.get(url, params=params, timeout=TIMEOUT)
-    resp.raise_for_status()
-    return resp.json()
-
-
 def fetch_crude_oil() -> dict:
-    """Fetch 90 days of daily WTI and Brent spot prices from EIA API v2."""
-    params = {
-        "frequency":          "daily",
-        "data[0]":            "value",
-        "sort[0][column]":    "period",
-        "sort[0][direction]": "desc",
-        "length":             "90",
-    }
-
+    """
+    Fetch ~90 days of daily WTI and Brent prices via Yahoo Finance.
+    Uses front-month futures (CL=F for WTI, BZ=F for Brent) which track
+    spot prices closely. Data is current to the prior trading day's close
+    (or today's if market has closed).
+    """
+    TICKERS = [("wti", "CL=F"), ("brent", "BZ=F")]
     results = {}
-    for grade, product_code in [("wti", WTI_PRODUCT), ("brent", BRENT_PRODUCT)]:
-        p = {**params, "facets[product][]": product_code}
-        log.info("Fetching %s crude prices from EIA …", grade.upper())
-        data = eia_get("petroleum/pri/spt/data", p)
-        rows = data.get("response", {}).get("data", [])
+
+    for grade, symbol in TICKERS:
+        log.info("Fetching %s crude prices from Yahoo Finance (%s) …", grade.upper(), symbol)
+        hist = yf.Ticker(symbol).history(period="6mo")
+
+        if hist.empty:
+            raise ValueError(f"No data returned for {symbol}")
+
         series = []
-        for row in rows:
-            val = row.get("value")
-            if val is not None:
-                series.append({
-                    "date":  row.get("period", ""),
-                    "price": round(float(val), 2),
-                })
-        series.reverse()  # chronological order for sparkline
+        for ts, row in hist.iterrows():
+            try:
+                price = round(float(row["Close"]), 2)
+            except (ValueError, TypeError):
+                continue
+            if price <= 0:
+                continue
+            series.append({
+                "date":  ts.strftime("%Y-%m-%d"),
+                "price": price,
+            })
+
+        # Keep the most recent 90 trading days
+        series = series[-90:]
         results[grade] = series
-        log.info("  %s: %d data points", grade.upper(), len(series))
+        log.info("  %s: %d data points, latest %s @ $%.2f",
+                 grade.upper(), len(series),
+                 series[-1]["date"], series[-1]["price"])
 
     return {
         "updated": datetime.now(timezone.utc).isoformat(),
-        "source":  "EIA (api.eia.gov) — petroleum spot prices",
+        "source":  "Yahoo Finance — WTI (CL=F) & Brent (BZ=F) front-month futures",
         "unit":    "USD/bbl",
         **results,
     }

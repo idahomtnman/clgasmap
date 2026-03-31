@@ -174,8 +174,8 @@ function initCrudeTable(crudeData) {
       </tbody>
     </table>
     <p class="crude-source">
-      Source: <a href="https://www.eia.gov/opendata/" target="_blank" rel="noopener">U.S. EIA</a>
-      spot prices &nbsp;·&nbsp; Data as of ${wti.date}
+      Source: Yahoo Finance — WTI (CL=F) &amp; Brent (BZ=F) front-month futures
+      &nbsp;·&nbsp; Data as of ${wti.date}
       &nbsp;·&nbsp; 90-day trend shown
     </p>
   `;
