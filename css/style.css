@@ -264,6 +264,160 @@ ul { list-style: none; }
   color: var(--text-dim);
 }
 
+/* ── State Price Table Section ── */
+
+.state-table-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+/* Toggle button — full-width clickable header */
+.state-table-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: left;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.state-table-toggle:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+.toggle-chevron {
+  font-size: 0.75rem;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+/* Rotate chevron when open */
+.state-table-toggle.open .toggle-chevron {
+  transform: rotate(180deg);
+}
+
+/* Collapsible wrapper — grid trick for smooth height animation */
+.state-table-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.35s ease;
+  border-top: 0px solid var(--border);
+}
+
+.state-table-wrap.expanded {
+  grid-template-rows: 1fr;
+  border-top-width: 1px;
+}
+
+.state-table-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Table */
+.state-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 1.25rem 1.25rem;
+}
+
+.state-price-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  min-width: 560px;
+}
+
+.state-price-table thead th {
+  padding: 0.55rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  text-align: left;
+}
+
+.state-price-table thead th.spt-num,
+.state-price-table thead th.spt-th-sort:not(:nth-child(2)) {
+  text-align: right;
+}
+
+/* State name stays left-aligned */
+.state-price-table thead th:nth-child(2) {
+  text-align: left;
+}
+
+.state-price-table tbody td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.state-price-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.state-price-table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Numeric columns right-aligned */
+.state-price-table .spt-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Sortable header */
+.spt-th-sort {
+  cursor: pointer;
+  user-select: none;
+}
+
+.spt-th-sort:hover {
+  color: var(--text-muted);
+}
+
+.spt-th-active {
+  color: var(--text) !important;
+}
+
+.spt-sort-arrow {
+  display: inline-block;
+  margin-left: 0.3em;
+  font-size: 0.65em;
+  opacity: 0.5;
+}
+
+.spt-th-active .spt-sort-arrow {
+  opacity: 1;
+  color: var(--accent);
+}
+
+/* Rank / pct color coding */
+.spt-rank-high { color: #e74c3c; font-weight: 600; }
+.spt-rank-low  { color: #52c27a; font-weight: 600; }
+.spt-pct-high  { color: #e74c3c; }
+.spt-pct-low   { color: #52c27a; }
+
 /* ── Crude Oil Section ── */
 
 .crude-section {

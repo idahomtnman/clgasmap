@@ -55,6 +55,7 @@ async function loadAll() {
 
     // ── Initialise components ──
     initMap(gasData, topoData);
+    initStateTable(gasData);
     initCrudeTable(crudeData);
 
   } catch (err) {

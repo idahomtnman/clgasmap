@@ -60,6 +60,20 @@
       </p>
     </section>
 
+    <!-- ── State Price Table ── -->
+    <section id="state-table-section" class="state-table-section" aria-label="State gas prices by grade">
+      <button class="state-table-toggle" id="state-table-toggle"
+              aria-expanded="false" aria-controls="state-table-wrap">
+        <span class="toggle-label">State Price Table</span>
+        <span class="toggle-chevron" aria-hidden="true">▼</span>
+      </button>
+      <div id="state-table-wrap" class="state-table-wrap" role="region">
+        <div class="state-table-inner">
+          <div id="state-table-container"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- ── Crude Oil (Phase 3) ── -->
     <section id="crude-section" class="crude-section" aria-label="Crude oil prices">
       <h2 class="section-title">Crude Oil Prices</h2>
@@ -104,6 +118,7 @@
   <script src="js/tooltip.js"></script>
   <script src="js/legend.js"></script>
   <script src="js/map.js"></script>
+  <script src="js/state_table.js"></script>
   <script src="js/crude_table.js"></script>
   <script src="js/app.js"></script>
 
