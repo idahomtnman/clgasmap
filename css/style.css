@@ -23,7 +23,7 @@
   --state-no-data: #3a3d50;
 
   /* Price scale colors */
-  --color-low:     #2ecc71;
+  --color-low:     #ffd700;
   --color-mid:     #f1c40f;
   --color-high:    #e74c3c;
 
@@ -208,12 +208,24 @@ ul { list-style: none; }
 
 #map-svg .state-label {
   font-family: var(--font);
-  font-size: 7px;
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 700;
+  fill: rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, 0.65);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+#map-svg .state-price-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 400;
   fill: rgba(255, 255, 255, 0.75);
   pointer-events: none;
   paint-order: stroke;
-  stroke: rgba(0, 0, 0, 0.55);
+  stroke: rgba(0, 0, 0, 0.65);
   stroke-width: 2.5px;
   stroke-linejoin: round;
 }

@@ -132,7 +132,7 @@ function drawLegend(colorScale, minPrice, maxPrice, nationalAvg) {
     .attr("y", TOP + BAR_H + 14)
     .attr("text-anchor", "middle")
     .attr("font-size", "9px")
-    .attr("fill", "#2ecc71")
+    .attr("fill", "#ffd700")
     .text("▲ lower");
 
   svg.append("text")

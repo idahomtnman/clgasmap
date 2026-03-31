@@ -97,7 +97,7 @@ function initMap(gasData, topoData) {
   const colorScale = d3.scaleSequential()
     .domain([domainMin, domainMax])
     .clamp(true)
-    .interpolator(t => d3.interpolateRdYlGn(1 - t));  // red = expensive, green = cheap
+    .interpolator(d3.interpolateYlOrRd);  // yellow = cheap, red = expensive
 
   // ── Rank map (1 = most expensive) ──
   const ranked = Object.entries(states)
@@ -137,23 +137,37 @@ function initMap(gasData, topoData) {
     .attr("stroke-width", 0.6)
     .attr("d", path);
 
-  // ── State labels (postal code, shown only for states large enough) ──
-  svg.selectAll("text.state-label")
+  // ── State labels: postal code + price, grouped per state ──
+  const labelGroups = svg.selectAll("g.state-label-group")
     .data(features)
-    .join("text")
-      .attr("class", "state-label")
+    .join("g")
+      .attr("class", "state-label-group")
       .attr("transform", d => {
         const c = path.centroid(d);
         return c && isFinite(c[0]) && isFinite(c[1]) ? `translate(${c})` : null;
       })
-      .attr("text-anchor", "middle")
-      .attr("dominant-baseline", "middle")
-      .attr("visibility", d => {
-        // Only label states whose path area is large enough to fit text
-        const area = path.area(d);
-        return area > 600 ? "visible" : "hidden";
-      })
-      .text(d => FIPS_TO_STATE[String(d.id).padStart(2, "0")] || "");
+      .attr("visibility", d => path.area(d) > 1200 ? "visible" : "hidden")
+      .attr("pointer-events", "none");
+
+  // Postal code — larger, shifted up to leave room for price below
+  labelGroups.append("text")
+    .attr("class", "state-label")
+    .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "middle")
+    .attr("y", -7)
+    .text(d => FIPS_TO_STATE[String(d.id).padStart(2, "0")] || "");
+
+  // Price — smaller than postal code but larger than original label size
+  labelGroups.append("text")
+    .attr("class", "state-price-label")
+    .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "middle")
+    .attr("y", 8)
+    .text(d => {
+      const code = FIPS_TO_STATE[String(d.id).padStart(2, "0")];
+      const price = states[code]?.regular;
+      return price != null ? `$${price.toFixed(2)}` : "";
+    });
 
   // ── Legend ──
   drawLegend(colorScale, minPrice, maxPrice, gasData.national_avg);
