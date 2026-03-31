@@ -146,19 +146,109 @@ function initMap(gasData, topoData) {
     .attr("stroke-width", 0.6)
     .attr("d", path);
 
-  // ── State labels: postal code + price, grouped per state ──
+  // ── Label placement configuration ──
+
+  // MI and FL: path.centroid falls in water — override with geographic coordinates
+  // that project to a point safely inside the state's land area.
+  const MANUAL_CENTROIDS = {
+    "MI": [-84.5, 44.2],   // lower peninsula, avoids Lake Michigan
+    "FL": [-81.7, 28.5],   // central Florida (Orlando area), avoids coastal water
+  };
+
+  // Small NE/Mid-Atlantic states: labels extend as callouts over the Atlantic.
+  // anchor: geographic [lon, lat] on land near the state's eastern edge
+  //         (projected at runtime → leader-line start)
+  // label:  fixed [x, y] in the 960×600 SVG coordinate space
+  //         (stacked column, right side of map over open Atlantic)
+  const CALLOUTS = {
+    "VT": { anchor: [-72.4, 43.8], label: [928, 150] },
+    "NH": { anchor: [-71.3, 43.5], label: [928, 175] },
+    "MA": { anchor: [-71.1, 42.4], label: [928, 200] },
+    "CT": { anchor: [-72.0, 41.6], label: [928, 225] },
+    "NJ": { anchor: [-74.3, 40.0], label: [928, 250] },
+    "MD": { anchor: [-76.2, 39.1], label: [928, 275] },
+  };
+
+  // Return the screen point to use as the leader-line anchor (on the state)
+  function anchorPt(feature) {
+    const code = FIPS_TO_STATE[String(feature.id).padStart(2, "0")];
+    if (code in CALLOUTS) {
+      const pt = proj(CALLOUTS[code].anchor);
+      return pt && isFinite(pt[0]) ? pt : path.centroid(feature);
+    }
+    if (code in MANUAL_CENTROIDS) {
+      const pt = proj(MANUAL_CENTROIDS[code]);
+      return pt && isFinite(pt[0]) ? pt : path.centroid(feature);
+    }
+    return path.centroid(feature);
+  }
+
+  // Return the screen position where the label group should be placed
+  function labelPt(feature) {
+    const code = FIPS_TO_STATE[String(feature.id).padStart(2, "0")];
+    if (code in CALLOUTS) return CALLOUTS[code].label;
+    return anchorPt(feature);
+  }
+
+  // Should we show labels for this state at all?
+  function showLabel(feature) {
+    const code = FIPS_TO_STATE[String(feature.id).padStart(2, "0")];
+    if (code in CALLOUTS || code in MANUAL_CENTROIDS) return true;
+    return path.area(feature) > 300;
+  }
+
+  // ── Leader lines (drawn before label groups so labels sit on top) ──
+  const calloutFeatures = features.filter(d =>
+    FIPS_TO_STATE[String(d.id).padStart(2, "0")] in CALLOUTS
+  );
+
+  svg.selectAll("line.callout-line")
+    .data(calloutFeatures)
+    .join("line")
+      .attr("class", "callout-line")
+      .attr("x1", d => anchorPt(d)[0])
+      .attr("y1", d => anchorPt(d)[1])
+      .attr("x2", d => CALLOUTS[FIPS_TO_STATE[String(d.id).padStart(2, "0")]].label[0])
+      .attr("y2", d => CALLOUTS[FIPS_TO_STATE[String(d.id).padStart(2, "0")]].label[1])
+      .attr("stroke", "rgba(255,255,255,0.32)")
+      .attr("stroke-width", 0.8)
+      .attr("stroke-dasharray", "3,2")
+      .attr("pointer-events", "none");
+
+  // Small dot at the anchor point on each callout state
+  svg.selectAll("circle.callout-dot")
+    .data(calloutFeatures)
+    .join("circle")
+      .attr("class", "callout-dot")
+      .attr("cx", d => anchorPt(d)[0])
+      .attr("cy", d => anchorPt(d)[1])
+      .attr("r", 2.5)
+      .attr("fill", "rgba(255,255,255,0.55)")
+      .attr("pointer-events", "none");
+
+  // ── Label groups (all states) ──
   const labelGroups = svg.selectAll("g.state-label-group")
     .data(features)
     .join("g")
       .attr("class", "state-label-group")
+      .attr("visibility", d => showLabel(d) ? "visible" : "hidden")
+      .attr("pointer-events", "none")
       .attr("transform", d => {
-        const c = path.centroid(d);
-        return c && isFinite(c[0]) && isFinite(c[1]) ? `translate(${c})` : null;
-      })
-      .attr("visibility", d => path.area(d) > 300 ? "visible" : "hidden")
-      .attr("pointer-events", "none");
+        const p = labelPt(d);
+        return p && isFinite(p[0]) ? `translate(${p[0]},${p[1]})` : "translate(-9999,-9999)";
+      });
 
-  // Postal code — shifted up to leave room for price below
+  // Dark background rect for callout labels (provides contrast over the ocean)
+  labelGroups.filter(d => FIPS_TO_STATE[String(d.id).padStart(2, "0")] in CALLOUTS)
+    .append("rect")
+      .attr("x", -26).attr("y", -19)
+      .attr("width", 52).attr("height", 37)
+      .attr("rx", 3)
+      .attr("fill", "rgba(8,10,20,0.78)")
+      .attr("stroke", "rgba(255,255,255,0.18)")
+      .attr("stroke-width", 0.5);
+
+  // Postal code label
   labelGroups.append("text")
     .attr("class", "state-label")
     .attr("text-anchor", "middle")
@@ -166,12 +256,13 @@ function initMap(gasData, topoData) {
     .attr("y", -8)
     .attr("fill", d => {
       const code = FIPS_TO_STATE[String(d.id).padStart(2, "0")];
+      if (code in CALLOUTS) return "rgba(255,255,255,0.92)";  // always light over ocean
       const price = states[code]?.regular;
       return labelColorFor(price != null ? colorScale(price) : "#3a3d50");
     })
     .text(d => FIPS_TO_STATE[String(d.id).padStart(2, "0")] || "");
 
-  // Price — between old label size and new postal code size
+  // Price label
   labelGroups.append("text")
     .attr("class", "state-price-label")
     .attr("text-anchor", "middle")
@@ -179,6 +270,7 @@ function initMap(gasData, topoData) {
     .attr("y", 9)
     .attr("fill", d => {
       const code = FIPS_TO_STATE[String(d.id).padStart(2, "0")];
+      if (code in CALLOUTS) return "rgba(255,255,255,0.82)";
       const price = states[code]?.regular;
       return labelColorFor(price != null ? colorScale(price) : "#3a3d50");
     })
