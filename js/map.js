@@ -163,10 +163,10 @@ function initMap(gasData, topoData) {
   // anchor: geographic [lon, lat] on land near eastern edge (leader-line start)
   // label:  [x, y] in 960×600 SVG space
   const CALLOUTS = {
-    "NH": { anchor: [-71.3, 43.5], label: [945, 150] },
-    "MA": { anchor: [-71.1, 42.4], label: [946, 185] },
-    "CT": { anchor: [-72.0, 41.6], label: [919, 227] },
-    "NJ": { anchor: [-74.3, 40.0], label: [898, 266] },
+    "NH": { anchor: [-71.3, 43.5], label: [938, 133] },
+    "MA": { anchor: [-71.1, 42.4], label: [938, 171] },
+    "CT": { anchor: [-72.0, 41.6], label: [920, 209] },
+    "NJ": { anchor: [-74.3, 40.0], label: [898, 251] },
     "MD": { anchor: [-76.2, 39.1], label: [889, 310] },
   };
 
