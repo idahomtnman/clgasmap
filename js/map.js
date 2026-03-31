@@ -203,18 +203,37 @@ function initMap(gasData, topoData) {
     FIPS_TO_STATE[String(d.id).padStart(2, "0")] in CALLOUTS
   );
 
-  svg.selectAll("line.callout-line")
-    .data(calloutFeatures)
-    .join("line")
-      .attr("class", "callout-line")
+  // Helper to set line endpoints from a callout feature
+  function setLineCoords(sel) {
+    return sel
       .attr("x1", d => anchorPt(d)[0])
       .attr("y1", d => anchorPt(d)[1])
       .attr("x2", d => CALLOUTS[FIPS_TO_STATE[String(d.id).padStart(2, "0")]].label[0])
       .attr("y2", d => CALLOUTS[FIPS_TO_STATE[String(d.id).padStart(2, "0")]].label[1])
-      .attr("stroke", "rgba(255,255,255,0.68)")
-      .attr("stroke-width", 1.5)
-      .attr("stroke-dasharray", "4,3")
       .attr("pointer-events", "none");
+  }
+
+  // Dark casing drawn first (wider, provides outline contrast on light states)
+  setLineCoords(
+    svg.selectAll("line.callout-line-casing")
+      .data(calloutFeatures)
+      .join("line")
+        .attr("class", "callout-line-casing")
+        .attr("stroke", "rgba(0,0,0,0.65)")
+        .attr("stroke-width", 4)
+        .attr("stroke-linecap", "round")
+  );
+
+  // White core drawn on top
+  setLineCoords(
+    svg.selectAll("line.callout-line")
+      .data(calloutFeatures)
+      .join("line")
+        .attr("class", "callout-line")
+        .attr("stroke", "rgba(255,255,255,0.85)")
+        .attr("stroke-width", 2)
+        .attr("stroke-linecap", "round")
+  );
 
   // Small dot at the anchor point on each callout state
   svg.selectAll("circle.callout-dot")
