@@ -515,11 +515,16 @@ ul { list-style: none; }
   .map-wrap {
     flex-direction: column;
   }
+
+  /* Legend stays compact — don't stretch the vertical gradient bar */
   .legend-container {
-    width: 100%;
+    width: 110px;
   }
-  #legend-svg {
-    width: 100%;
+
+  /* Crude table: allow horizontal scroll if columns overflow */
+  #crude-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -527,12 +532,41 @@ ul { list-style: none; }
   .page-main {
     padding: 1rem;
   }
+
   .header-inner {
     flex-direction: column;
   }
+
+  /* Badge fills full width on mobile so it doesn't look orphaned */
+  .national-avg-badge {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .map-section,
+  .crude-section {
+    padding: 0.85rem;
+  }
+
+  /* Hide sparkline column on small screens — not readable at narrow widths */
+  .crude-table th:last-child,
+  .crude-table td:last-child {
+    display: none;
+  }
+
+  /* Tighten up crude table cell padding */
+  .crude-table td,
+  .crude-table th {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
   .footer-inner {
     grid-template-columns: 1fr;
   }
+
   .page-title {
     font-size: 1.3rem;
   }
