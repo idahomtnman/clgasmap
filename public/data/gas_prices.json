@@ -1,258 +1,315 @@
 {
-  "updated": "2026-03-31T04:51:06.165170+00:00",
+  "updated": "2026-03-31T04:59:10.681657+00:00",
+  "source": "AAA (gasprices.aaa.com)",
   "unit": "USD/gal",
-  "product": "Regular Unleaded (all formulations)",
-  "national_avg": 4.096,
+  "parse_method": "table",
+  "national_avg": 3.932,
   "states": {
-    "AL": {
-      "price": 3.702,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
     "AK": {
-      "price": 5.394,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 4.607,
+      "mid_grade": 4.863,
+      "premium": 5.09,
+      "diesel": 5.626
     },
-    "AZ": {
-      "price": 5.394,
-      "period": "2026-03-23",
-      "is_regional": true
+    "AL": {
+      "regular": 3.646,
+      "mid_grade": 4.07,
+      "premium": 4.481,
+      "diesel": 5.214
     },
     "AR": {
-      "price": 3.702,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.409,
+      "mid_grade": 3.865,
+      "premium": 4.219,
+      "diesel": 4.83
+    },
+    "AZ": {
+      "regular": 4.677,
+      "mid_grade": 5.084,
+      "premium": 5.392,
+      "diesel": 5.997
     },
     "CA": {
-      "price": 5.764,
-      "period": "2026-03-23",
-      "is_regional": false
+      "regular": 5.877,
+      "mid_grade": 6.101,
+      "premium": 6.302,
+      "diesel": 7.364
     },
     "CO": {
-      "price": 4.011,
-      "period": "2026-03-23",
-      "is_regional": false
+      "regular": 3.904,
+      "mid_grade": 4.295,
+      "premium": 4.622,
+      "diesel": 4.92
     },
     "CT": {
-      "price": 3.848,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.939,
+      "mid_grade": 4.46,
+      "premium": 4.88,
+      "diesel": 5.832
+    },
+    "DC": {
+      "regular": 4.176,
+      "mid_grade": 4.696,
+      "premium": 5.114,
+      "diesel": 5.661
     },
     "DE": {
-      "price": 3.97,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.87,
+      "mid_grade": 4.456,
+      "premium": 4.752,
+      "diesel": 5.727
     },
     "FL": {
-      "price": 3.984,
-      "period": "2026-03-23",
-      "is_regional": false
+      "regular": 3.954,
+      "mid_grade": 4.392,
+      "premium": 4.723,
+      "diesel": 5.618
     },
     "GA": {
-      "price": 3.863,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.581,
+      "mid_grade": 4.022,
+      "premium": 4.444,
+      "diesel": 5.086
     },
     "HI": {
-      "price": 5.394,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
-    "ID": {
-      "price": 3.982,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
-    "IL": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
-    "IN": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 5.418,
+      "mid_grade": 5.622,
+      "premium": 5.856,
+      "diesel": 6.604
     },
     "IA": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.281,
+      "mid_grade": 3.549,
+      "premium": 4.158,
+      "diesel": 4.877
+    },
+    "ID": {
+      "regular": 4.261,
+      "mid_grade": 4.544,
+      "premium": 4.799,
+      "diesel": 5.501
+    },
+    "IL": {
+      "regular": 4.209,
+      "mid_grade": 4.792,
+      "premium": 5.266,
+      "diesel": 5.151
+    },
+    "IN": {
+      "regular": 3.992,
+      "mid_grade": 4.54,
+      "premium": 5.028,
+      "diesel": 5.192
     },
     "KS": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.256,
+      "mid_grade": 3.584,
+      "premium": 3.916,
+      "diesel": 4.553
     },
     "KY": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.716,
+      "mid_grade": 4.261,
+      "premium": 4.699,
+      "diesel": 5.029
     },
     "LA": {
-      "price": 3.702,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
-    "ME": {
-      "price": 3.848,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
-    "MD": {
-      "price": 3.97,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.606,
+      "mid_grade": 4.007,
+      "premium": 4.414,
+      "diesel": 5.089
     },
     "MA": {
-      "price": 3.839,
-      "period": "2026-03-23",
-      "is_regional": false
+      "regular": 3.807,
+      "mid_grade": 4.364,
+      "premium": 4.766,
+      "diesel": 5.697
+    },
+    "MD": {
+      "regular": 4.006,
+      "mid_grade": 4.568,
+      "premium": 4.902,
+      "diesel": 5.763
+    },
+    "ME": {
+      "regular": 3.836,
+      "mid_grade": 4.367,
+      "premium": 4.841,
+      "diesel": 5.721
     },
     "MI": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.944,
+      "mid_grade": 4.534,
+      "premium": 5.098,
+      "diesel": 5.025
     },
     "MN": {
-      "price": 3.496,
-      "period": "2026-03-23",
-      "is_regional": false
-    },
-    "MS": {
-      "price": 3.702,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.417,
+      "mid_grade": 3.852,
+      "premium": 4.351,
+      "diesel": 4.884
     },
     "MO": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.414,
+      "mid_grade": 3.853,
+      "premium": 4.155,
+      "diesel": 4.606
+    },
+    "MS": {
+      "regular": 3.583,
+      "mid_grade": 4.023,
+      "premium": 4.401,
+      "diesel": 5.072
     },
     "MT": {
-      "price": 3.982,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
-    "NE": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
-    "NV": {
-      "price": 5.394,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
-    "NH": {
-      "price": 3.848,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
-    "NJ": {
-      "price": 3.97,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
-    "NM": {
-      "price": 3.702,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
-    "NY": {
-      "price": 3.916,
-      "period": "2026-03-23",
-      "is_regional": false
+      "regular": 3.704,
+      "mid_grade": 4.015,
+      "premium": 4.365,
+      "diesel": 4.789
     },
     "NC": {
-      "price": 3.863,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.759,
+      "mid_grade": 4.201,
+      "premium": 4.6,
+      "diesel": 5.493
     },
     "ND": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.429,
+      "mid_grade": 3.776,
+      "premium": 4.216,
+      "diesel": 4.583
+    },
+    "NE": {
+      "regular": 3.334,
+      "mid_grade": 3.548,
+      "premium": 4.023,
+      "diesel": 4.613
+    },
+    "NH": {
+      "regular": 3.755,
+      "mid_grade": 4.303,
+      "premium": 4.764,
+      "diesel": 5.635
+    },
+    "NJ": {
+      "regular": 3.878,
+      "mid_grade": 4.39,
+      "premium": 4.675,
+      "diesel": 5.72
+    },
+    "NM": {
+      "regular": 3.86,
+      "mid_grade": 4.305,
+      "premium": 4.611,
+      "diesel": 5.251
+    },
+    "NV": {
+      "regular": 4.91,
+      "mid_grade": 5.22,
+      "premium": 5.526,
+      "diesel": 6.088
+    },
+    "NY": {
+      "regular": 3.93,
+      "mid_grade": 4.417,
+      "premium": 4.813,
+      "diesel": 5.75
     },
     "OH": {
-      "price": 3.822,
-      "period": "2026-03-23",
-      "is_regional": false
+      "regular": 3.822,
+      "mid_grade": 4.349,
+      "premium": 4.862,
+      "diesel": 5.06
     },
     "OK": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.256,
+      "mid_grade": 3.675,
+      "premium": 3.97,
+      "diesel": 4.481
     },
     "OR": {
-      "price": 5.394,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 4.894,
+      "mid_grade": 5.12,
+      "premium": 5.405,
+      "diesel": 6.025
     },
     "PA": {
-      "price": 3.97,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.942,
+      "mid_grade": 4.375,
+      "premium": 4.752,
+      "diesel": 5.904
     },
     "RI": {
-      "price": 3.848,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.827,
+      "mid_grade": 4.501,
+      "premium": 4.896,
+      "diesel": 5.705
     },
     "SC": {
-      "price": 3.863,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.647,
+      "mid_grade": 4.059,
+      "premium": 4.468,
+      "diesel": 5.34
     },
     "SD": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.388,
+      "mid_grade": 3.62,
+      "premium": 4.106,
+      "diesel": 4.617
     },
     "TN": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.632,
+      "mid_grade": 4.081,
+      "premium": 4.494,
+      "diesel": 5.287
     },
     "TX": {
-      "price": 3.706,
-      "period": "2026-03-23",
-      "is_regional": false
+      "regular": 3.61,
+      "mid_grade": 4.069,
+      "premium": 4.446,
+      "diesel": 4.957
     },
     "UT": {
-      "price": 3.982,
-      "period": "2026-03-23",
-      "is_regional": true
-    },
-    "VT": {
-      "price": 3.848,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 4.195,
+      "mid_grade": 4.474,
+      "premium": 4.719,
+      "diesel": 5.482
     },
     "VA": {
-      "price": 3.863,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.886,
+      "mid_grade": 4.351,
+      "premium": 4.728,
+      "diesel": 5.512
+    },
+    "VT": {
+      "regular": 3.912,
+      "mid_grade": 4.395,
+      "premium": 4.862,
+      "diesel": 5.712
     },
     "WA": {
-      "price": 5.256,
-      "period": "2026-03-23",
-      "is_regional": false
-    },
-    "WV": {
-      "price": 3.863,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 5.33,
+      "mid_grade": 5.55,
+      "premium": 5.803,
+      "diesel": 6.56
     },
     "WI": {
-      "price": 3.772,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.618,
+      "mid_grade": 4.141,
+      "premium": 4.71,
+      "diesel": 4.741
+    },
+    "WV": {
+      "regular": 3.809,
+      "mid_grade": 4.262,
+      "premium": 4.713,
+      "diesel": 5.364
     },
     "WY": {
-      "price": 3.982,
-      "period": "2026-03-23",
-      "is_regional": true
+      "regular": 3.827,
+      "mid_grade": 4.132,
+      "premium": 4.428,
+      "diesel": 4.986
     }
   }
 }

@@ -1,5 +1,6 @@
 {
-  "updated": "2026-03-31T04:51:07.118730+00:00",
+  "updated": "2026-03-31T04:59:11.862076+00:00",
+  "source": "EIA (api.eia.gov) \u2014 petroleum spot prices",
   "unit": "USD/bbl",
   "wti": [
     {

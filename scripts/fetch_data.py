@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
 """
-fetch_data.py — Daily EIA data fetcher for clgasmap
-Writes static JSON files consumed by the front-end map.
+fetch_data.py — Daily data fetcher for clgasmap
+  - Gas prices:  AAA (gasprices.aaa.com) — daily, all 50 states, unique per state
+  - Crude oil:   EIA API v2             — daily WTI + Brent spot prices (90 days)
 
 Outputs:
-  public/data/gas_prices.json  — per-state weekly retail gas prices
-  public/data/crude_oil.json   — WTI + Brent daily spot prices (90 days)
+  public/data/gas_prices.json   — per-state daily retail gas prices
+  public/data/crude_oil.json    — WTI + Brent daily spot prices (90 days)
   public/data/last_updated.json — fetch metadata / status
 """
 
 import json
 import logging
 import os
+import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 
 import requests
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
 # ---------------------------------------------------------------------------
@@ -25,7 +29,6 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "public" / "data"
 LOG_DIR = ROOT / "logs"
-STATE_CODES_FILE = Path(__file__).parent / "eia_state_codes.json"
 
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -53,19 +56,168 @@ if not API_KEY:
     sys.exit(1)
 
 EIA_BASE = "https://api.eia.gov/v2"
-TIMEOUT = 30  # seconds per request
+AAA_URL  = "https://gasprices.aaa.com/state-gas-price-averages/"
+TIMEOUT  = 30
 
-# EIA product codes for the petroleum/pri/gnd endpoint
-GAS_PRODUCT = "EPM0"       # Regular Motor Gasoline (all formulations)
-WTI_PRODUCT  = "EPCWTI"   # WTI Cushing spot price
-BRENT_PRODUCT = "EPCBRENT" # Brent spot price
+WTI_PRODUCT   = "EPCWTI"
+BRENT_PRODUCT = "EPCBRENT"
+
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/123.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
+}
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
+def write_json(path: Path, data: dict) -> None:
+    """Atomic write via temp file."""
+    tmp = path.with_suffix(".tmp")
+    with open(tmp, "w") as f:
+        json.dump(data, f, indent=2)
+    tmp.replace(path)
+    log.info("Wrote %s", path.name)
+
+
+def parse_price(raw: str) -> float | None:
+    """Strip '$' and whitespace, return float or None."""
+    try:
+        return round(float(raw.strip().lstrip("$")), 3)
+    except (ValueError, AttributeError):
+        return None
+
+# ---------------------------------------------------------------------------
+# AAA gas prices — all 50 states, daily
+# ---------------------------------------------------------------------------
+
+def _parse_table(soup: BeautifulSoup) -> dict[str, dict]:
+    """Primary method: parse <table id='sortable'>."""
+    table = soup.find("table", {"id": "sortable"})
+    if not table:
+        raise ValueError("Could not find #sortable table in AAA page")
+
+    results: dict[str, dict] = {}
+    for row in table.find("tbody").find_all("tr"):
+        cells = row.find_all("td")
+        if len(cells) < 2:
+            continue
+
+        # State code from the href: ?state=CA
+        link = cells[0].find("a")
+        if not link:
+            continue
+        href = link.get("href", "")
+        qs = parse_qs(urlparse(href).query)
+        state_code = qs.get("state", [None])[0]
+        if not state_code:
+            # Fall back: match two-letter uppercase in query string
+            m = re.search(r"state=([A-Z]{2})", href)
+            state_code = m.group(1) if m else None
+        if not state_code:
+            continue
+
+        def cell_price(cls: str) -> float | None:
+            td = row.find("td", class_=cls)
+            return parse_price(td.get_text()) if td else None
+
+        regular   = cell_price("regular")
+        mid_grade = cell_price("mid_grade")
+        premium   = cell_price("premium")
+        diesel    = cell_price("diesel")
+
+        if regular is None:
+            continue
+
+        results[state_code] = {
+            "regular":   regular,
+            "mid_grade": mid_grade,
+            "premium":   premium,
+            "diesel":    diesel,
+        }
+
+    return results
+
+
+def _parse_placestxt(html: str) -> dict[str, dict]:
+    """
+    Fallback method: extract prices from the embedded JS variable:
+      placestxt: "CA,California,$5.877,url,#color;HI,Hawaii,$5.418,...;"
+    Contains regular prices only.
+    """
+    m = re.search(r'"placestxt"\s*:\s*"([^"]+)"', html)
+    if not m:
+        raise ValueError("placestxt JS variable not found in AAA page")
+
+    results: dict[str, dict] = {}
+    for entry in m.group(1).split(";"):
+        parts = entry.strip().split(",")
+        if len(parts) < 3:
+            continue
+        state_code = parts[0].strip()
+        price = parse_price(parts[2])
+        if state_code and price is not None:
+            results[state_code] = {
+                "regular":   price,
+                "mid_grade": None,
+                "premium":   None,
+                "diesel":    None,
+            }
+
+    return results
+
+
+def fetch_gas_prices() -> dict:
+    """
+    Scrape AAA state gas price averages page.
+    Returns all 50 states with regular, mid-grade, premium, and diesel prices.
+    """
+    log.info("Fetching AAA gas prices from %s …", AAA_URL)
+    resp = requests.get(AAA_URL, headers=HEADERS, timeout=TIMEOUT)
+    resp.raise_for_status()
+
+    soup = BeautifulSoup(resp.text, "lxml")
+
+    # Try primary table parse; fall back to JS placestxt
+    try:
+        states = _parse_table(soup)
+        method = "table"
+        log.info("Parsed %d states from HTML table", len(states))
+    except Exception as exc:
+        log.warning("Table parse failed (%s), trying placestxt fallback …", exc)
+        states = _parse_placestxt(resp.text)
+        method = "placestxt_fallback"
+        log.info("Parsed %d states from placestxt JS variable", len(states))
+
+    if len(states) < 48:
+        raise ValueError(
+            f"Only {len(states)} states parsed — page structure may have changed"
+        )
+
+    # National average of regular prices across all states
+    regular_prices = [v["regular"] for v in states.values() if v["regular"] is not None]
+    national_avg = round(sum(regular_prices) / len(regular_prices), 3) if regular_prices else None
+
+    return {
+        "updated":      datetime.now(timezone.utc).isoformat(),
+        "source":       "AAA (gasprices.aaa.com)",
+        "unit":         "USD/gal",
+        "parse_method": method,
+        "national_avg": national_avg,
+        "states":       states,
+    }
+
+
+# ---------------------------------------------------------------------------
+# EIA crude oil prices — WTI + Brent, 90 days
+# ---------------------------------------------------------------------------
+
 def eia_get(path: str, params: dict) -> dict:
-    """GET an EIA v2 endpoint; raises on HTTP error."""
     params["api_key"] = API_KEY
     url = f"{EIA_BASE}/{path}"
     resp = requests.get(url, params=params, timeout=TIMEOUT)
@@ -73,133 +225,20 @@ def eia_get(path: str, params: dict) -> dict:
     return resp.json()
 
 
-def load_state_codes() -> dict:
-    with open(STATE_CODES_FILE) as f:
-        return json.load(f)
-
-
-def write_json(path: Path, data: dict) -> None:
-    tmp = path.with_suffix(".tmp")
-    with open(tmp, "w") as f:
-        json.dump(data, f, indent=2)
-    tmp.replace(path)   # atomic replace
-    log.info("Wrote %s", path.name)
-
-
-def load_existing(path: Path) -> dict | None:
-    if path.exists():
-        with open(path) as f:
-            return json.load(f)
-    return None
-
-# ---------------------------------------------------------------------------
-# Gas prices — all states in one batched request
-# ---------------------------------------------------------------------------
-
-def fetch_gas_prices(state_codes: dict) -> dict:
-    """
-    Fetch most-recent weekly retail regular gas price for all 50 states
-    in a single EIA v2 request.  Falls back to PADD regional average for
-    any state that returns no data.
-
-    Returns dict keyed by postal code, e.g.:
-      { "CA": {"price": 4.523, "period": "2026-03-24", "is_regional": False}, ... }
-    """
-    duoareas = list(state_codes["states"].keys())
-    padd_codes = list(state_codes["padd_regions"].keys())
-    all_areas = duoareas + padd_codes  # fetch regions too for fallback
-
-    # Build params — EIA v2 accepts repeated facets as indexed keys
-    params = {
-        "frequency": "weekly",
-        "data[0]": "value",
-        "facets[product][]": GAS_PRODUCT,
-        "sort[0][column]": "period",
-        "sort[0][direction]": "desc",
-        "length": "300",  # plenty of room for 50 states × 1 period + regions
-    }
-    for i, code in enumerate(all_areas):
-        params[f"facets[duoarea][{i}]"] = code
-
-    log.info("Fetching gas prices for %d state/region duoareas …", len(all_areas))
-    data = eia_get("petroleum/pri/gnd/data", params)
-
-    # Index the response: keep only the most-recent record per duoarea
-    by_area: dict[str, dict] = {}
-    for row in data.get("response", {}).get("data", []):
-        area = row.get("duoarea", "")
-        if area not in by_area:  # already sorted desc, first = latest
-            val = row.get("value")
-            if val is not None:
-                by_area[area] = {
-                    "price": round(float(val), 3),
-                    "period": row.get("period", ""),
-                }
-
-    log.info("EIA returned prices for %d areas", len(by_area))
-
-    # Map to postal codes; fall back to PADD region when state missing
-    results: dict[str, dict] = {}
-    missing: list[str] = []
-    for eia_code, meta in state_codes["states"].items():
-        postal = meta["postal"]
-        if eia_code in by_area:
-            results[postal] = {**by_area[eia_code], "is_regional": False}
-        else:
-            padd = meta["padd"]
-            if padd in by_area:
-                results[postal] = {**by_area[padd], "is_regional": True}
-                log.warning("%s (%s): no state data, using %s regional avg",
-                            postal, meta["name"], padd)
-            else:
-                results[postal] = None  # will be rendered as "no data"
-                missing.append(postal)
-
-    if missing:
-        log.warning("No data at all for: %s", ", ".join(missing))
-
-    # National average
-    national_avg = None
-    if "NUS" in by_area:
-        national_avg = by_area["NUS"]["price"]
-    elif results:
-        prices = [v["price"] for v in results.values() if v is not None]
-        if prices:
-            national_avg = round(sum(prices) / len(prices), 3)
-
-    return {
-        "updated": datetime.now(timezone.utc).isoformat(),
-        "unit": "USD/gal",
-        "product": "Regular Unleaded (all formulations)",
-        "national_avg": national_avg,
-        "states": results,
-    }
-
-
-# ---------------------------------------------------------------------------
-# Crude oil prices — WTI + Brent, 90 days
-# ---------------------------------------------------------------------------
-
 def fetch_crude_oil() -> dict:
-    """
-    Fetch 90 days of daily WTI and Brent spot prices.
-
-    Returns:
-      { "wti": [{"date": "2026-03-28", "price": 71.23}, ...],
-        "brent": [...] }
-    """
+    """Fetch 90 days of daily WTI and Brent spot prices from EIA API v2."""
     params = {
-        "frequency": "daily",
-        "data[0]": "value",
-        "sort[0][column]": "period",
+        "frequency":          "daily",
+        "data[0]":            "value",
+        "sort[0][column]":    "period",
         "sort[0][direction]": "desc",
-        "length": "90",
+        "length":             "90",
     }
 
     results = {}
     for grade, product_code in [("wti", WTI_PRODUCT), ("brent", BRENT_PRODUCT)]:
         p = {**params, "facets[product][]": product_code}
-        log.info("Fetching %s crude prices …", grade.upper())
+        log.info("Fetching %s crude prices from EIA …", grade.upper())
         data = eia_get("petroleum/pri/spt/data", p)
         rows = data.get("response", {}).get("data", [])
         series = []
@@ -207,17 +246,17 @@ def fetch_crude_oil() -> dict:
             val = row.get("value")
             if val is not None:
                 series.append({
-                    "date": row.get("period", ""),
+                    "date":  row.get("period", ""),
                     "price": round(float(val), 2),
                 })
-        # Response is desc; reverse to chronological for sparkline rendering
-        series.reverse()
+        series.reverse()  # chronological order for sparkline
         results[grade] = series
         log.info("  %s: %d data points", grade.upper(), len(series))
 
     return {
         "updated": datetime.now(timezone.utc).isoformat(),
-        "unit": "USD/bbl",
+        "source":  "EIA (api.eia.gov) — petroleum spot prices",
+        "unit":    "USD/bbl",
         **results,
     }
 
@@ -228,19 +267,17 @@ def fetch_crude_oil() -> dict:
 
 def main() -> None:
     log.info("=== clgasmap fetch started ===")
-    state_codes = load_state_codes()
     errors = []
 
-    # --- Gas prices ---
+    # --- Gas prices (AAA) ---
     try:
-        gas_data = fetch_gas_prices(state_codes)
+        gas_data = fetch_gas_prices()
         write_json(DATA_DIR / "gas_prices.json", gas_data)
     except Exception as exc:
         log.error("Gas price fetch failed: %s", exc)
         errors.append(f"gas_prices: {exc}")
-        # Preserve last successful file (already there if it exists)
 
-    # --- Crude oil ---
+    # --- Crude oil (EIA) ---
     try:
         crude_data = fetch_crude_oil()
         write_json(DATA_DIR / "crude_oil.json", crude_data)
@@ -248,13 +285,12 @@ def main() -> None:
         log.error("Crude oil fetch failed: %s", exc)
         errors.append(f"crude_oil: {exc}")
 
-    # --- Status file ---
-    status = {
+    # --- Status ---
+    write_json(DATA_DIR / "last_updated.json", {
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "status": "error" if errors else "ok",
-        "errors": errors if errors else None,
-    }
-    write_json(DATA_DIR / "last_updated.json", status)
+        "status":    "error" if errors else "ok",
+        "errors":    errors if errors else None,
+    })
 
     if errors:
         log.error("Fetch completed with errors: %s", errors)
