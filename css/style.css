@@ -215,9 +215,10 @@ ul { list-style: none; }
 }
 
 #map-svg .state-price-label {
-  font-family: var(--font-mono);
+  font-family: var(--font);
   font-size: 11px;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
   pointer-events: none;
   /* fill set dynamically per state via JS based on background luminance */
 }

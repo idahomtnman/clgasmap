@@ -81,36 +81,50 @@ function drawLegend(colorScale, minPrice, maxPrice, nationalAvg) {
   if (nationalAvg != null && nationalAvg >= minPrice && nationalAvg <= maxPrice) {
     const y = yScale(nationalAvg);
 
-    // Arrow / marker
+    // Outlined arrow — dark casing behind vivid blue fill
     svg.append("polygon")
-      .attr("points", `${LEFT - 7},${y} ${LEFT - 1},${y - 4} ${LEFT - 1},${y + 4}`)
-      .attr("fill", "#ffffff");
+      .attr("points", `${LEFT - 13},${y} ${LEFT - 1},${y - 7} ${LEFT - 1},${y + 7}`)
+      .attr("fill", "rgba(0,0,0,0.75)");
+    svg.append("polygon")
+      .attr("points", `${LEFT - 11},${y} ${LEFT - 1},${y - 5} ${LEFT - 1},${y + 5}`)
+      .attr("fill", "#29b6f6");
 
+    // Solid rule across the gradient bar
     svg.append("line")
       .attr("x1", LEFT - 1)
       .attr("y1", y)
       .attr("x2", LEFT + BAR_W)
       .attr("y2", y)
-      .attr("stroke", "rgba(255,255,255,0.7)")
-      .attr("stroke-width", 1)
-      .attr("stroke-dasharray", "2,2");
+      .attr("stroke", "#000")
+      .attr("stroke-width", 1.5)
+      .attr("opacity", 0.5);
+    svg.append("line")
+      .attr("x1", LEFT - 1)
+      .attr("y1", y)
+      .attr("x2", LEFT + BAR_W)
+      .attr("y2", y)
+      .attr("stroke", "#29b6f6")
+      .attr("stroke-width", 0.8);
 
+    // Labels
     svg.append("text")
       .attr("class", "legend-national-label")
-      .attr("x", LEFT - 9)
-      .attr("y", y - 6)
+      .attr("x", LEFT - 13)
+      .attr("y", y - 8)
       .attr("text-anchor", "middle")
-      .attr("font-size", "8px")
-      .attr("fill", "rgba(255,255,255,0.75)")
+      .attr("font-size", "10px")
+      .attr("font-weight", "600")
+      .attr("fill", "#29b6f6")
       .text("nat'l");
 
     svg.append("text")
       .attr("class", "legend-national-label")
-      .attr("x", LEFT - 9)
-      .attr("y", y + 13)
+      .attr("x", LEFT - 13)
+      .attr("y", y + 16)
       .attr("text-anchor", "middle")
-      .attr("font-size", "8px")
-      .attr("fill", "rgba(255,255,255,0.75)")
+      .attr("font-size", "10px")
+      .attr("font-weight", "600")
+      .attr("fill", "#29b6f6")
       .text(`$${nationalAvg.toFixed(2)}`);
   }
 
