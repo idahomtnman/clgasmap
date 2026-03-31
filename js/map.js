@@ -148,25 +148,26 @@ function initMap(gasData, topoData) {
 
   // ── Label placement configuration ──
 
-  // MI and FL: path.centroid falls in water — override with geographic coordinates
-  // that project to a point safely inside the state's land area.
+  // States where path.centroid falls in water — override with a geographic
+  // coordinate that projects to a safe point inside the state's land area.
+  // VT is small but entirely on land; place label at its geographic center.
   const MANUAL_CENTROIDS = {
-    "MI": [-84.5, 44.2],   // lower peninsula, avoids Lake Michigan
+    "MI": [-84.3, 43.3],   // south-central lower peninsula, clear of all Great Lakes
     "FL": [-81.7, 28.5],   // central Florida (Orlando area), avoids coastal water
+    "VT": [-72.7, 44.0],   // geographic center of Vermont, back on the map
   };
 
-  // Small NE/Mid-Atlantic states: labels extend as callouts over the Atlantic.
-  // anchor: geographic [lon, lat] on land near the state's eastern edge
-  //         (projected at runtime → leader-line start)
-  // label:  fixed [x, y] in the 960×600 SVG coordinate space
-  //         (stacked column, right side of map over open Atlantic)
+  // Small NE/Mid-Atlantic coastal states: labels extend as callouts over the
+  // Atlantic. Positions are staggered (x varies, y spaced ≥38px) to follow
+  // the coastline contour and avoid overlapping background rects.
+  // anchor: geographic [lon, lat] on land near eastern edge (leader-line start)
+  // label:  [x, y] in 960×600 SVG space
   const CALLOUTS = {
-    "VT": { anchor: [-72.4, 43.8], label: [928, 150] },
-    "NH": { anchor: [-71.3, 43.5], label: [928, 175] },
-    "MA": { anchor: [-71.1, 42.4], label: [928, 200] },
-    "CT": { anchor: [-72.0, 41.6], label: [928, 225] },
-    "NJ": { anchor: [-74.3, 40.0], label: [928, 250] },
-    "MD": { anchor: [-76.2, 39.1], label: [928, 275] },
+    "NH": { anchor: [-71.3, 43.5], label: [916, 158] },
+    "MA": { anchor: [-71.1, 42.4], label: [942, 196] },
+    "CT": { anchor: [-72.0, 41.6], label: [928, 234] },
+    "NJ": { anchor: [-74.3, 40.0], label: [944, 272] },
+    "MD": { anchor: [-76.2, 39.1], label: [918, 312] },
   };
 
   // Return the screen point to use as the leader-line anchor (on the state)
@@ -210,9 +211,9 @@ function initMap(gasData, topoData) {
       .attr("y1", d => anchorPt(d)[1])
       .attr("x2", d => CALLOUTS[FIPS_TO_STATE[String(d.id).padStart(2, "0")]].label[0])
       .attr("y2", d => CALLOUTS[FIPS_TO_STATE[String(d.id).padStart(2, "0")]].label[1])
-      .attr("stroke", "rgba(255,255,255,0.32)")
-      .attr("stroke-width", 0.8)
-      .attr("stroke-dasharray", "3,2")
+      .attr("stroke", "rgba(255,255,255,0.68)")
+      .attr("stroke-width", 1.5)
+      .attr("stroke-dasharray", "4,3")
       .attr("pointer-events", "none");
 
   // Small dot at the anchor point on each callout state
@@ -222,8 +223,8 @@ function initMap(gasData, topoData) {
       .attr("class", "callout-dot")
       .attr("cx", d => anchorPt(d)[0])
       .attr("cy", d => anchorPt(d)[1])
-      .attr("r", 2.5)
-      .attr("fill", "rgba(255,255,255,0.55)")
+      .attr("r", 3)
+      .attr("fill", "rgba(255,255,255,0.75)")
       .attr("pointer-events", "none");
 
   // ── Label groups (all states) ──
@@ -241,8 +242,8 @@ function initMap(gasData, topoData) {
   // Dark background rect for callout labels (provides contrast over the ocean)
   labelGroups.filter(d => FIPS_TO_STATE[String(d.id).padStart(2, "0")] in CALLOUTS)
     .append("rect")
-      .attr("x", -26).attr("y", -19)
-      .attr("width", 52).attr("height", 37)
+      .attr("x", -26).attr("y", -17)
+      .attr("width", 52).attr("height", 33)
       .attr("rx", 3)
       .attr("fill", "rgba(8,10,20,0.78)")
       .attr("stroke", "rgba(255,255,255,0.18)")
