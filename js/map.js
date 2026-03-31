@@ -128,8 +128,8 @@ function initMap(gasData, topoData) {
         const price = states[code]?.regular;
         return price != null ? colorScale(price) : "var(--state-no-data)";
       })
-      .attr("stroke", "var(--state-border)")
-      .attr("stroke-width", 0.5)
+      .attr("stroke", "rgba(0,0,0,0.6)")
+      .attr("stroke-width", 0.8)
     .on("mousemove", (event, d) => {
         const code = FIPS_TO_STATE[String(d.id).padStart(2, "0")];
         showTooltip(buildTooltip(code, states[code], rankMap, totalRanked, gasData.national_avg), event);
@@ -137,13 +137,13 @@ function initMap(gasData, topoData) {
       })
     .on("mouseleave", hideTooltip);
 
-  // ── Interior state borders (drawn over fills for crisp lines) ──
+  // ── Interior state borders — reinforces the dark outline between adjacent states ──
   svg.append("path")
     .datum(topojson.mesh(topoData, topoData.objects.states, (a, b) => a !== b))
     .attr("class", "state-borders")
     .attr("fill", "none")
-    .attr("stroke", "rgba(255,255,255,0.18)")
-    .attr("stroke-width", 0.6)
+    .attr("stroke", "rgba(0,0,0,0.35)")
+    .attr("stroke-width", 0.5)
     .attr("d", path);
 
   // ── Label placement configuration ──
@@ -152,7 +152,7 @@ function initMap(gasData, topoData) {
   // coordinate that projects to a safe point inside the state's land area.
   // VT is small but entirely on land; place label at its geographic center.
   const MANUAL_CENTROIDS = {
-    "MI": [-84.3, 43.3],   // south-central lower peninsula, clear of all Great Lakes
+    "MI": [-84.3, 42.8],   // southern lower peninsula, moved further from Great Lakes
     "FL": [-81.7, 28.5],   // central Florida (Orlando area), avoids coastal water
     "VT": [-72.7, 44.0],   // geographic center of Vermont, back on the map
   };
