@@ -1,0 +1,430 @@
+/* ═══════════════════════════════════════════════════════
+   clgasmap — US Gas Price Map
+   Dark theme · CSS custom properties for easy theming
+═══════════════════════════════════════════════════════ */
+
+:root {
+  /* Palette */
+  --bg:            #0f1117;
+  --surface:       #1a1d27;
+  --surface-2:     #22263a;
+  --border:        rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  /* Text */
+  --text:          #e8eaf0;
+  --text-muted:    #8b8fa8;
+  --text-dim:      #555970;
+  --accent:        #4a9eff;
+  --accent-hover:  #72b4ff;
+
+  /* Map */
+  --state-border:  rgba(255, 255, 255, 0.22);
+  --state-no-data: #3a3d50;
+
+  /* Price scale colors */
+  --color-low:     #2ecc71;
+  --color-mid:     #f1c40f;
+  --color-high:    #e74c3c;
+
+  /* Tooltip */
+  --tooltip-bg:    rgba(8, 10, 20, 0.94);
+  --tooltip-border:rgba(255, 255, 255, 0.12);
+
+  /* Stale banner */
+  --banner-bg:     rgba(241, 196, 15, 0.12);
+  --banner-border: rgba(241, 196, 15, 0.4);
+  --banner-text:   #f1c40f;
+
+  /* Layout */
+  --max-width:     1280px;
+  --radius:        8px;
+  --radius-sm:     4px;
+
+  /* Typography */
+  --font:          "Roboto", system-ui, -apple-system, sans-serif;
+  --font-mono:     "Roboto Mono", "Courier New", monospace;
+}
+
+/* ── Reset & Base ── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+ul { list-style: none; }
+
+/* ── Extension Slots ── */
+
+#content-above,
+#content-below {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+#content-above:not(:empty) { padding: 1.5rem 1.5rem 0; }
+#content-below:not(:empty) { padding: 0 1.5rem 1.5rem; }
+
+/* ── Page Layout ── */
+
+.page-main {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 2rem;
+}
+
+/* ── Page Header ── */
+
+.page-header {
+  margin-bottom: 1.25rem;
+}
+
+.header-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.page-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.national-avg-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  min-width: 100px;
+}
+
+.badge-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.badge-price {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+/* ── Stale Data Banner ── */
+
+.stale-banner {
+  background: var(--banner-bg);
+  border: 1px solid var(--banner-border);
+  border-radius: var(--radius-sm);
+  color: var(--banner-text);
+  font-size: 0.85rem;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.stale-banner.hidden { display: none; }
+
+/* ── Map Section ── */
+
+.map-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.map-wrap {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.map-container {
+  flex: 1;
+  min-width: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #131620;
+}
+
+#map-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* State paths styled via D3, but base here */
+#map-svg .state {
+  cursor: default;
+  transition: filter 0.1s ease;
+}
+#map-svg .state:hover {
+  filter: brightness(1.25);
+}
+
+#map-svg .state-label {
+  font-family: var(--font);
+  font-size: 7px;
+  font-weight: 500;
+  fill: rgba(255, 255, 255, 0.75);
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, 0.55);
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+}
+
+/* ── Legend ── */
+
+.legend-container {
+  flex-shrink: 0;
+  width: 110px;
+}
+
+#legend-svg {
+  display: block;
+  width: 110px;
+  overflow: visible;
+}
+
+.legend-title {
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 500;
+  fill: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.legend-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--text-muted);
+}
+
+.legend-national-label {
+  font-family: var(--font);
+  font-size: 9px;
+  fill: #fff;
+}
+
+/* ── Map Attribution ── */
+
+.map-attribution {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+/* ── Crude Oil Section ── */
+
+.crude-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+}
+
+.loading-msg {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  padding: 1rem 0;
+}
+
+/* ── Footer ── */
+
+.page-footer {
+  border-top: 1px solid var(--border);
+  margin-top: 1rem;
+  padding: 1.5rem;
+  max-width: var(--max-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.footer-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.footer-sources strong,
+.footer-notes strong {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.footer-sources ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.footer-sources li,
+.footer-notes p {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.footer-updated {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Tooltip ── */
+
+.tooltip {
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  background: var(--tooltip-bg);
+  border: 1px solid var(--tooltip-border);
+  border-radius: var(--radius);
+  padding: 0.65rem 0.85rem;
+  min-width: 160px;
+  max-width: 220px;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity 0.08s ease;
+}
+
+.tooltip.visible { opacity: 1; }
+
+.tt-state {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+}
+
+.tt-price {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+
+.tt-grades {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.1rem 0.5rem;
+}
+
+.tt-grades span { white-space: nowrap; }
+
+.tt-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0.35rem 0;
+}
+
+.tt-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.tt-rank-high { color: #e74c3c; }
+.tt-rank-low  { color: #2ecc71; }
+
+.tt-no-data {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 900px) {
+  .map-wrap {
+    flex-direction: column;
+  }
+  .legend-container {
+    width: 100%;
+  }
+  #legend-svg {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-main {
+    padding: 1rem;
+  }
+  .header-inner {
+    flex-direction: column;
+  }
+  .footer-inner {
+    grid-template-columns: 1fr;
+  }
+  .page-title {
+    font-size: 1.3rem;
+  }
+}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>US Gas Price Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════
+       Extension slot: content above the map
+       Inject text, banners, or graphics here
+  ════════════════════════════════════════════════ -->
+  <section id="content-above"></section>
+
+  <main class="page-main">
+
+    <header class="page-header">
+      <div class="header-inner">
+        <div>
+          <h1 class="page-title">US Average Gas Prices</h1>
+          <p class="page-subtitle">Regular Unleaded · All 50 States · Updated Daily</p>
+        </div>
+        <div class="header-meta">
+          <div class="national-avg-badge">
+            <span class="badge-label">National Avg</span>
+            <span class="badge-price" id="national-avg-price">—</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div id="stale-banner" class="stale-banner hidden" role="alert">
+      ⚠ Data may be delayed — last successfully updated more than 36 hours ago
+    </div>
+
+    <!-- ── Map + Legend ── -->
+    <section class="map-section" aria-label="Gas price map">
+      <div class="map-wrap">
+        <div class="map-container">
+          <svg id="map-svg"
+               viewBox="0 0 960 600"
+               preserveAspectRatio="xMidYMid meet"
+               aria-label="US choropleth map of average gas prices by state">
+            <desc>Color-coded map showing average regular unleaded gas prices across all 50 US states. Green indicates lower prices, red indicates higher prices.</desc>
+          </svg>
+        </div>
+        <aside class="legend-container" aria-label="Price color legend">
+          <svg id="legend-svg"></svg>
+        </aside>
+      </div>
+
+      <p class="map-attribution">
+        Source: <a href="https://gasprices.aaa.com/state-gas-price-averages/" target="_blank" rel="noopener noreferrer">AAA Gas Price Averages</a>
+        · Data as of: <span id="last-updated-text">loading…</span>
+      </p>
+    </section>
+
+    <!-- ── Crude Oil (Phase 3) ── -->
+    <section id="crude-section" class="crude-section" aria-label="Crude oil prices">
+      <h2 class="section-title">Crude Oil Prices</h2>
+      <div id="crude-table-container">
+        <p class="loading-msg">Loading crude oil data…</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════════════
+       Extension slot: content below the map
+       Inject analysis, charts, or additional graphics here
+  ════════════════════════════════════════════════ -->
+  <section id="content-below"></section>
+
+  <footer class="page-footer">
+    <div class="footer-inner">
+      <div class="footer-sources">
+        <strong>Sources</strong>
+        <ul>
+          <li>Gas prices: <a href="https://gasprices.aaa.com" target="_blank" rel="noopener noreferrer">AAA (American Automobile Association)</a> — daily average retail prices for regular unleaded gasoline, all 50 states + DC</li>
+          <li>Crude oil: <a href="https://www.eia.gov/opendata/" target="_blank" rel="noopener noreferrer">U.S. Energy Information Administration (EIA) API v2</a> — WTI Cushing and Brent North Sea daily spot prices (public domain)</li>
+        </ul>
+      </div>
+      <div class="footer-notes">
+        <strong>Methodology</strong>
+        <p>Prices are daily averages compiled from retail stations reporting to AAA. Crude oil prices are spot market closing prices and typically reflect the prior business day. Data is fetched and updated automatically each day.</p>
+      </div>
+      <p class="footer-updated" id="footer-updated"></p>
+    </div>
+  </footer>
+
+  <!-- Hover tooltip -->
+  <div id="tooltip" class="tooltip" role="tooltip" aria-hidden="true"></div>
+
+  <!-- ── Dependencies (CDN) ── -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+
+  <!-- ── App modules ── -->
+  <script src="js/tooltip.js"></script>
+  <script src="js/legend.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/crude_table.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
