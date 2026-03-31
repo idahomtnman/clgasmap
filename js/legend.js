@@ -81,50 +81,42 @@ function drawLegend(colorScale, minPrice, maxPrice, nationalAvg) {
   if (nationalAvg != null && nationalAvg >= minPrice && nationalAvg <= maxPrice) {
     const y = yScale(nationalAvg);
 
-    // Outlined arrow — dark casing behind vivid blue fill
-    svg.append("polygon")
-      .attr("points", `${LEFT - 13},${y} ${LEFT - 1},${y - 7} ${LEFT - 1},${y + 7}`)
-      .attr("fill", "rgba(0,0,0,0.75)");
-    svg.append("polygon")
-      .attr("points", `${LEFT - 11},${y} ${LEFT - 1},${y - 5} ${LEFT - 1},${y + 5}`)
-      .attr("fill", "#29b6f6");
-
-    // Solid rule across the gradient bar
+    // Solid black bar across the gradient
     svg.append("line")
-      .attr("x1", LEFT - 1)
-      .attr("y1", y)
-      .attr("x2", LEFT + BAR_W)
-      .attr("y2", y)
+      .attr("x1", LEFT).attr("y1", y)
+      .attr("x2", LEFT + BAR_W).attr("y2", y)
       .attr("stroke", "#000")
-      .attr("stroke-width", 1.5)
-      .attr("opacity", 0.5);
-    svg.append("line")
-      .attr("x1", LEFT - 1)
-      .attr("y1", y)
-      .attr("x2", LEFT + BAR_W)
-      .attr("y2", y)
-      .attr("stroke", "#29b6f6")
-      .attr("stroke-width", 0.8);
+      .attr("stroke-width", 2.5);
 
-    // Labels
+    // Outlined arrow — black casing + white fill, larger for visibility
+    svg.append("polygon")
+      .attr("points", `${LEFT - 16},${y} ${LEFT},${y - 9} ${LEFT},${y + 9}`)
+      .attr("fill", "#000");
+    svg.append("polygon")
+      .attr("points", `${LEFT - 13},${y} ${LEFT},${y - 6} ${LEFT},${y + 6}`)
+      .attr("fill", "#fff");
+
+    // Labels — right-aligned against the bar, bold white with dark outline
     svg.append("text")
       .attr("class", "legend-national-label")
-      .attr("x", LEFT - 13)
-      .attr("y", y - 8)
-      .attr("text-anchor", "middle")
-      .attr("font-size", "10px")
-      .attr("font-weight", "600")
-      .attr("fill", "#29b6f6")
-      .text("nat'l");
+      .attr("x", LEFT - 2).attr("y", y - 11)
+      .attr("text-anchor", "end")
+      .attr("font-size", "11px").attr("font-weight", "700")
+      .attr("fill", "#fff")
+      .attr("paint-order", "stroke")
+      .attr("stroke", "#000").attr("stroke-width", "3px")
+      .attr("stroke-linejoin", "round")
+      .text("nat'l avg");
 
     svg.append("text")
       .attr("class", "legend-national-label")
-      .attr("x", LEFT - 13)
-      .attr("y", y + 16)
-      .attr("text-anchor", "middle")
-      .attr("font-size", "10px")
-      .attr("font-weight", "600")
-      .attr("fill", "#29b6f6")
+      .attr("x", LEFT - 2).attr("y", y + 19)
+      .attr("text-anchor", "end")
+      .attr("font-size", "11px").attr("font-weight", "700")
+      .attr("fill", "#fff")
+      .attr("paint-order", "stroke")
+      .attr("stroke", "#000").attr("stroke-width", "3px")
+      .attr("stroke-linejoin", "round")
       .text(`$${nationalAvg.toFixed(2)}`);
   }
 
