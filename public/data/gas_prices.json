@@ -1,0 +1,258 @@
+{
+  "updated": "2026-03-31T04:51:06.165170+00:00",
+  "unit": "USD/gal",
+  "product": "Regular Unleaded (all formulations)",
+  "national_avg": 4.096,
+  "states": {
+    "AL": {
+      "price": 3.702,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "AK": {
+      "price": 5.394,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "AZ": {
+      "price": 5.394,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "AR": {
+      "price": 3.702,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "CA": {
+      "price": 5.764,
+      "period": "2026-03-23",
+      "is_regional": false
+    },
+    "CO": {
+      "price": 4.011,
+      "period": "2026-03-23",
+      "is_regional": false
+    },
+    "CT": {
+      "price": 3.848,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "DE": {
+      "price": 3.97,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "FL": {
+      "price": 3.984,
+      "period": "2026-03-23",
+      "is_regional": false
+    },
+    "GA": {
+      "price": 3.863,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "HI": {
+      "price": 5.394,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "ID": {
+      "price": 3.982,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "IL": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "IN": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "IA": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "KS": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "KY": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "LA": {
+      "price": 3.702,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "ME": {
+      "price": 3.848,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "MD": {
+      "price": 3.97,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "MA": {
+      "price": 3.839,
+      "period": "2026-03-23",
+      "is_regional": false
+    },
+    "MI": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "MN": {
+      "price": 3.496,
+      "period": "2026-03-23",
+      "is_regional": false
+    },
+    "MS": {
+      "price": 3.702,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "MO": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "MT": {
+      "price": 3.982,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "NE": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "NV": {
+      "price": 5.394,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "NH": {
+      "price": 3.848,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "NJ": {
+      "price": 3.97,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "NM": {
+      "price": 3.702,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "NY": {
+      "price": 3.916,
+      "period": "2026-03-23",
+      "is_regional": false
+    },
+    "NC": {
+      "price": 3.863,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "ND": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "OH": {
+      "price": 3.822,
+      "period": "2026-03-23",
+      "is_regional": false
+    },
+    "OK": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "OR": {
+      "price": 5.394,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "PA": {
+      "price": 3.97,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "RI": {
+      "price": 3.848,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "SC": {
+      "price": 3.863,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "SD": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "TN": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "TX": {
+      "price": 3.706,
+      "period": "2026-03-23",
+      "is_regional": false
+    },
+    "UT": {
+      "price": 3.982,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "VT": {
+      "price": 3.848,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "VA": {
+      "price": 3.863,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "WA": {
+      "price": 5.256,
+      "period": "2026-03-23",
+      "is_regional": false
+    },
+    "WV": {
+      "price": 3.863,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "WI": {
+      "price": 3.772,
+      "period": "2026-03-23",
+      "is_regional": true
+    },
+    "WY": {
+      "price": 3.982,
+      "period": "2026-03-23",
+      "is_regional": true
+    }
+  }
+}
