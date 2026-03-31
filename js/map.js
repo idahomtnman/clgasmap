@@ -203,17 +203,42 @@ function initMap(gasData, topoData) {
     FIPS_TO_STATE[String(d.id).padStart(2, "0")] in CALLOUTS
   );
 
-  // Helper to set line endpoints from a callout feature
+  // ── Arrowhead marker definitions ──
+  // Two-layer outlined arrowhead: dark casing behind white fill.
+  // Both share refX=12/refY=5 so tips land at the same point on the state.
+  const defs = svg.append("defs");
+
+  defs.append("marker")
+    .attr("id", "callout-arrow-casing")
+    .attr("markerUnits", "userSpaceOnUse")
+    .attr("markerWidth", 14).attr("markerHeight", 10)
+    .attr("refX", 12).attr("refY", 5)
+    .attr("orient", "auto")
+    .append("path")
+      .attr("d", "M0,0 L12,5 L0,10 z")       // full-width dark triangle
+      .attr("fill", "rgba(0,0,0,0.82)");
+
+  defs.append("marker")
+    .attr("id", "callout-arrow")
+    .attr("markerUnits", "userSpaceOnUse")
+    .attr("markerWidth", 14).attr("markerHeight", 10)
+    .attr("refX", 12).attr("refY", 5)
+    .attr("orient", "auto")
+    .append("path")
+      .attr("d", "M0,2 L12,5 L0,8 z")         // narrower white triangle (dark peeks 2px each side)
+      .attr("fill", "rgba(255,255,255,0.92)");
+
+  // Lines run FROM the label TOWARD the state so marker-end arrow points at the state
   function setLineCoords(sel) {
     return sel
-      .attr("x1", d => anchorPt(d)[0])
-      .attr("y1", d => anchorPt(d)[1])
-      .attr("x2", d => CALLOUTS[FIPS_TO_STATE[String(d.id).padStart(2, "0")]].label[0])
-      .attr("y2", d => CALLOUTS[FIPS_TO_STATE[String(d.id).padStart(2, "0")]].label[1])
+      .attr("x1", d => CALLOUTS[FIPS_TO_STATE[String(d.id).padStart(2, "0")]].label[0])
+      .attr("y1", d => CALLOUTS[FIPS_TO_STATE[String(d.id).padStart(2, "0")]].label[1])
+      .attr("x2", d => anchorPt(d)[0])
+      .attr("y2", d => anchorPt(d)[1])
       .attr("pointer-events", "none");
   }
 
-  // Dark casing drawn first (wider, provides outline contrast on light states)
+  // Dark casing (body outline + arrowhead outline)
   setLineCoords(
     svg.selectAll("line.callout-line-casing")
       .data(calloutFeatures)
@@ -222,9 +247,10 @@ function initMap(gasData, topoData) {
         .attr("stroke", "rgba(0,0,0,0.65)")
         .attr("stroke-width", 4)
         .attr("stroke-linecap", "round")
+        .attr("marker-end", "url(#callout-arrow-casing)")
   );
 
-  // White core drawn on top
+  // White core (body + arrowhead fill drawn on top)
   setLineCoords(
     svg.selectAll("line.callout-line")
       .data(calloutFeatures)
@@ -233,18 +259,8 @@ function initMap(gasData, topoData) {
         .attr("stroke", "rgba(255,255,255,0.85)")
         .attr("stroke-width", 2)
         .attr("stroke-linecap", "round")
+        .attr("marker-end", "url(#callout-arrow)")
   );
-
-  // Small dot at the anchor point on each callout state
-  svg.selectAll("circle.callout-dot")
-    .data(calloutFeatures)
-    .join("circle")
-      .attr("class", "callout-dot")
-      .attr("cx", d => anchorPt(d)[0])
-      .attr("cy", d => anchorPt(d)[1])
-      .attr("r", 3)
-      .attr("fill", "rgba(255,255,255,0.75)")
-      .attr("pointer-events", "none");
 
   // ── Label groups (all states) ──
   const labelGroups = svg.selectAll("g.state-label-group")
