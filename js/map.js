@@ -163,11 +163,11 @@ function initMap(gasData, topoData) {
   // anchor: geographic [lon, lat] on land near eastern edge (leader-line start)
   // label:  [x, y] in 960×600 SVG space
   const CALLOUTS = {
-    "NH": { anchor: [-71.3, 43.5], label: [916, 158] },
-    "MA": { anchor: [-71.1, 42.4], label: [942, 196] },
-    "CT": { anchor: [-72.0, 41.6], label: [928, 234] },
-    "NJ": { anchor: [-74.3, 40.0], label: [944, 272] },
-    "MD": { anchor: [-76.2, 39.1], label: [918, 312] },
+    "NH": { anchor: [-71.3, 43.5], label: [945, 150] },
+    "MA": { anchor: [-71.1, 42.4], label: [946, 185] },
+    "CT": { anchor: [-72.0, 41.6], label: [919, 227] },
+    "NJ": { anchor: [-74.3, 40.0], label: [898, 266] },
+    "MD": { anchor: [-76.2, 39.1], label: [889, 310] },
   };
 
   // Return the screen point to use as the leader-line anchor (on the state)
