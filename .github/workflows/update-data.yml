@@ -2,8 +2,10 @@ name: Update Data
 
 on:
   schedule:
-    # 10:30 AM UTC = ~6:30 AM ET — after EIA publishes overnight prices
+    # Primary:  10:30 AM UTC = ~6:30 AM ET — after AAA publishes overnight prices
     - cron: "30 10 * * *"
+    # Backup:   2:30 PM UTC = ~10:30 AM ET — fires if GitHub skipped the primary run
+    - cron: "30 14 * * *"
   workflow_dispatch:   # allow manual trigger from GitHub Actions UI
 
 jobs:
@@ -11,12 +13,32 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write   # needed to push the data commit back to main
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # opt in before June 2 2026 forced cutover
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Skip if data is already fresh (< 6 hours old)
+        id: freshness
+        run: |
+          TIMESTAMP=$(python3 -c "
+          import json, sys
+          from datetime import datetime, timezone, timedelta
+          try:
+              d = json.load(open('public/data/last_updated.json'))
+              ts = datetime.fromisoformat(d['timestamp'])
+              age = datetime.now(timezone.utc) - ts
+              print('stale' if age > timedelta(hours=6) else 'fresh')
+          except Exception:
+              print('stale')
+          ")
+          echo "data_state=$TIMESTAMP" >> "$GITHUB_OUTPUT"
+          echo "Data freshness check: $TIMESTAMP"
+
       - name: Set up Python
+        if: steps.freshness.outputs.data_state == 'stale'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -24,14 +46,17 @@ jobs:
           cache-dependency-path: scripts/requirements.txt
 
       - name: Install dependencies
+        if: steps.freshness.outputs.data_state == 'stale'
         run: pip install -r scripts/requirements.txt
 
       - name: Fetch data
+        if: steps.freshness.outputs.data_state == 'stale'
         env:
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
         run: python scripts/fetch_data.py
 
       - name: Commit updated data
+        if: steps.freshness.outputs.data_state == 'stale'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -42,4 +67,5 @@ jobs:
           git diff --cached --quiet || git commit -m "data: daily auto-update $(date -u '+%Y-%m-%d')"
 
       - name: Push
+        if: steps.freshness.outputs.data_state == 'stale'
         run: git push origin main
