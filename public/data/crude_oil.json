@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-03T12:27:40.994130+00:00",
+  "updated": "2026-07-04T11:52:32.244023+00:00",
   "source": "Yahoo Finance \u2014 WTI (CL=F) & Brent (BZ=F) front-month futures",
   "unit": "USD/bbl",
   "wti": [
@@ -361,7 +361,7 @@
     },
     {
       "date": "2026-07-03",
-      "price": 68.32
+      "price": 68.78
     }
   ],
   "brent": [
@@ -723,7 +723,7 @@
     },
     {
       "date": "2026-07-03",
-      "price": 71.57
+      "price": 72.13
     }
   ]
 }
