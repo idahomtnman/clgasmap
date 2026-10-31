@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-30T16:47:27.139751+00:00",
+  "updated": "2026-10-31T15:50:10.408912+00:00",
   "source": "Yahoo Finance \u2014 WTI (CL=F) & Brent (BZ=F) front-month futures",
   "unit": "USD/bbl",
   "wti": [
@@ -361,7 +361,7 @@
     },
     {
       "date": "2026-10-30",
-      "price": 104.14
+      "price": 104.12
     }
   ],
   "brent": [
@@ -723,7 +723,7 @@
     },
     {
       "date": "2026-10-30",
-      "price": 113.42
+      "price": 117.64
     }
   ]
 }
